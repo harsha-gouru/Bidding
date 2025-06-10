@@ -66,6 +66,25 @@ Paste your project paragraph, hit Enter twice, and you'll get a line-item table 
 
 ---
 
+## All-in-one Chat UI
+
+Prefer a friendly front-end?  Run:
+
+```bash
+python chat_app.py
+# → open http://127.0.0.1:7860
+```
+
+You'll get a ChatGPT-style interface where you can:
+• say hello,  
+• paste or upload your bid text,  
+• watch the JSON stream live,  
+• and see the final pricing table rendered inline.
+
+No extra setup—`gradio` is already in `requirements.txt`.
+
+---
+
 Brain storm with me I want to create a chat bot i will get request like this I want to do electrician bidding mto mu is 1.2 for the following, cat6A cable 130 quantity mto cost/unit 95 minutes per unit 100, install cat6A jacks 260 quantity mto cost/unit 11 minutes per unit 9, Provide and install Cat6 48-port patch panels 4 quantity mto cost/unit 120 minutes per unit 30, Provide and install patch cord  quantity 130  mto cost/unit 16 minutes per unit 5, Provide and install faceplates ro biscuit jacks 108 quantity mto cost/unit 3.85 minutes per unit 8, remove old cabling quantity 1  mto cost/unit 150 minutes per unit 600, Test, label and certify Cat6 cables 130 quantity mto cost/unit 3 minutes per unit 10, Consumables 1 quantity mto cost/unit 1000 minutes per unit 60, Provide and install 12 strand multi-mode fiber OM4 1145 quantity mto cost/unit 1.46 minutes per unit 1, provide and install 12 count LC OM4 cassettes 6 quantity mto cost/unit 430 minutes per unit 120, provide and install New fiber housing unit 1U  4 quantity mto cost/unit 185 minutes per unit 15, Provide and install fiber spool 4 quantity mto cost/unit 120 minutes per unit 30, Test and certify fiber cabling 36 quantity mto cost/unit 1.25 minutes per unit 5, Provide and install wall mount IDF cabinet 1 quantity mto cost/unit 780 minutes per unit 120, provide and install fire rated back board  1 quantity mto cost/unit 89 minutes per unit 120. Tax Percent: 0.0825 and extractin information and calculate accordingly
 You are a professional Construction Bid Estimator Assistant specializing in network, electrical, and plumbing project cost estimation. Your purpose is to guide users through a structured, stage-based bidding process that delivers accurate, detailed cost breakdowns and professional proposals.
  
