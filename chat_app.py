@@ -32,36 +32,64 @@ def _markdown_table(bid_result: dict) -> str:
 
 
 def chat_flow(message, history, file):
-    """Generate assistant reply with streaming JSON then pricing table."""
+    """Yield progressive status messages, then final Markdown table."""
 
     user_input = message or (file.read().decode() if file else "")
     if not user_input.strip():
-        return "Please paste text or upload a .txt file."  # early return
+        yield "Please paste text or upload a .txt file to estimate costs."
+        return
 
-    # Start JSON code block
-    reply_prefix = "```json\n"
+    # Stream extraction as JSON tokens ----------------------------------
     json_buffer = ""
+    base_prefix = "```json\n"
+    yield "🔄 Parsing input..."
 
-    # Stream extraction tokens
+    bid_obj = None
     for chunk in extractor.extract_stream(user_input):
         if isinstance(chunk, str):
             json_buffer += chunk
-            yield reply_prefix + json_buffer  # intermediate partial
+            yield base_prefix + json_buffer  # live JSON
         else:
-            bid_obj = chunk  # final object
+            bid_obj = chunk  # final object received
 
-    # Close JSON block and append pricing
-    full_reply = reply_prefix + json_buffer + "\n```\n"
+    if bid_obj is None:
+        yield "❌ Failed to parse input."
+        return
 
+    # Parsed fully
+    parsed_json_md = base_prefix + json_buffer + "\n```\n\n✅ Parsed input\n🔄 Calculating pricing..."
+    yield parsed_json_md
+
+    # Pricing ------------------------------------------------------------
     priced = price_bid(bid_obj.items, bid_obj.bid_type, bid_obj.tax_percent)
-    full_reply += dedent(
-        f"""
-        **Bid Summary – {priced['bid_type']}**
-        {_markdown_table(priced)}
-        """
+
+    # Stream table rows one-by-one, keeping JSON block on top
+    header = (
+        f"**Bid Summary – {priced['bid_type']}**\n"
+        "| Item | Qty | Labor $ | Material $ | M-Hrs |\n"
+        "|------|----:|--------:|-----------:|------:|"
     )
 
-    yield full_reply  # final message
+    current_reply = parsed_json_md + "\n" + header
+    yield current_reply
+
+    for line in priced["lines"]:
+        row = (
+            f"| {line['name']} | {line['quantity']} | {line['labor_total_sale']:.2f} | "
+            f"{line['material_sale']:.2f} | {line['man_hours']:.2f} |"
+        )
+        current_reply += "\n" + row
+        yield current_reply
+
+    totals = (
+        f"\n| **Totals** | | | **{priced['labor']:.2f}** | **{priced['material']:.2f}** | |"
+        f"\n| **Tax** | | | | **{priced['tax']:.2f}** | |"
+        f"\n| **Grand Total** | | | **{priced['total']:.2f}** | | |"
+    )
+    current_reply += totals
+
+    # Final yield
+    yield current_reply
 
 
 def main():
@@ -70,7 +98,7 @@ def main():
         title="Bid Estimator Chat",
         textbox=gr.Textbox(placeholder="Paste your bid text here…", scale=7),
         additional_inputs=gr.File(label="Upload bid text", file_types=[".txt"]),
-        description="Paste or upload bid data. The bot streams extracted JSON then pricing table.",
+        description="Hi 👋 Paste or upload your bid data and I'll return a cost breakdown table.",
         type="messages",
     )
     chat.launch()
