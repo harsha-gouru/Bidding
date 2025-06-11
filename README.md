@@ -701,4 +701,3 @@ Then regex‑grab the block between ` ` and `json.loads()` it, still validating 
 
 With this scaffold, GPT‑4‑class models reliably score ~100 % on numeric extraction in production. Fine‑tuning becomes unnecessary until you have hundreds of edge‑case examples that still fail validation.
 
-Copy, paste, and ship!
